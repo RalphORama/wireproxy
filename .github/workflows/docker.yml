@@ -64,7 +64,7 @@ jobs:
       - name: Set dynamic variables
         id: vars
         run: |
-          echo "${{ github.event.pull_request.head.ref || github.ref }}" | sed -r 's#^refs/(heads|tags)/##' >> $GITHUB_OUTPUT
+          echo REF_NAME="${{ github.event.pull_request.head.ref || github.ref }}" | sed -r 's#^refs/(heads|tags)/##' >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
