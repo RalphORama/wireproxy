@@ -1,6 +1,14 @@
 .dockerignore
-.github
 .gitignore
+compose.yaml
+compose.example.yaml
 Dockerfile
-LICENSE
 README.md
+test_config.sh
+UseWithVPN.md
+
+.github/
+assets/
+config/
+rc.d/
+systemd/
