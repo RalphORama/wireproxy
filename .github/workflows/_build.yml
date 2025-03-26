@@ -35,7 +35,11 @@ jobs:
         id: dynamic_vars
         run: |
           echo dir=release_${{ matrix.go_os }}_${{ matrix.go_arch }} >> $GITHUB_OUTPUT
-          echo filename=wireproxy${{ matrix.go_os == 'windows' && '.exe' }} >> $GITHUB_OUTPUT
+          if [ "${{ matrix.go_os }}" = "windows" ]; then
+            echo filename=wireproxy.exe >> $GITHUB_OUTPUT
+          else
+            echo filename=wireproxy >> $GITHUB_OUTPUT
+          fi
 
 
       - name: Build wireproxy for ${{ matrix.go_os }} ${{ matrix.go_arch }}
