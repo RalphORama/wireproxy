@@ -93,8 +93,10 @@ jobs:
           # Tag images based on the 'include' section (i.e. wireproxy-latest, wireproxy-alpine)
           # also tag debain12 base as 'latest' if we're pushing to the default branch (master)
           tags: |
-            type=raw,value=${{ matrix.tag }}
-            type=raw,value=latest,enable=${{ github.event_name == 'push' && matrix.tag == 'debian12' }}
+            type=raw,value=${{ matrix.tag }},priority=2000
+            type=raw,value=latest,enable=${{ github.event_name == 'push' && matrix.tag == 'debian12' }},priority=3000
+            type=edge,enable=false
+            type=sha,enable=false
           labels: |
             org.opencontainers.image.title="wireproxy"
             org.opencontainers.image.description="Wireguard client that exposes itself as a socks5/http proxy"
