@@ -51,7 +51,7 @@ jobs:
         # Publish the 'latest' tag as nonroot
         include:
           - base_image: gcr.io/distroless/static-debian12:nonroot
-            tag: 'debian12'
+            tag: 'bookworm'
           - base_image: alpine:latest
             tag: 'alpine'
 
