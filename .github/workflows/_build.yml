@@ -41,7 +41,7 @@ jobs:
       - name: Build wireproxy for ${{ matrix.go_os }} ${{ matrix.go_arch }}
         env:
           GOOS: ${{ matrix.go_os }}
-          GOARCH: $${{ matrix.go_arch }}
+          GOARCH: ${{ matrix.go_arch }}
         run: |
           mkdir -v ${{ steps.dynamic_vars.outputs.dir }}
           go build -o ${{ steps.dynamic_vars.outputs.dir }}/${{ steps.dynamic_vars.outputs.filename }} -v ./cmd/wireproxy
