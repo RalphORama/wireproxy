@@ -1,0 +1,62 @@
+name: Test
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  binary:
+    name: test wireproxy binary
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        go_version:
+          - '1.21'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go_version }}
+
+      - name: Install Ubuntu Packages
+        run: sudo apt-get install -y wireguard curl
+
+      - name: Build Wireproxy
+        run: |
+          git tag dev
+          make
+
+      - name: Generate test config
+        run: ./test_config.sh
+
+      - name: Run configtest
+        run: |
+          ./wireproxy --config test.conf --configtest
+
+      - name: Start wireproxy
+        run: |
+          ./wireproxy --config test.conf & sleep 1
+
+      - name: Test socks5
+        run: |
+          curl --fail --fail-early --proxy socks5://localhost:64423 http://zx2c4.com/ip | grep -q "demo.wireguard.com"
+
+      - name: Test http
+        run: |
+          curl --fail --fail-early --proxy http://localhost:64424 http://zx2c4.com/ip | grep -q "demo.wireguard.com"
+
+      - name: Test http with password
+        run: |
+          curl --fail --fail-early --proxy http://peter:hunter123@localhost:64424 http://zx2c4.com/ip | grep -q "demo.wireguard.com"
+
+      - name: Test http with wrong password
+        run: |
+          set +e
+          curl -s --fail --fail-early --proxy http://peter:wrongpass@localhost:64425 http://zx2c4.com/ip
+          if [[ $? == 0 ]]; then exit 1; fi

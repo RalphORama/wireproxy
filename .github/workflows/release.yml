@@ -2,23 +2,38 @@ name: Cross compile WireProxy
 
 on:
   workflow_dispatch:
-  create:
-     tags:
-       - v*
+  release:
+    types:
+      - published
+  push:
+    tags:
+      - '**'
 
 jobs:
+  lint:
+    uses: "./.github/workflows/_lint.yml"
+
+  build:
+    needs: [ "lint" ]
+    uses: "./.github/workflows/_build.yml"
+
+  test:
+    needs: [ "build" ]
+    uses: "./.github/workflows/_test.yml"
+
   WireProxy:
+    name: Publish WireProxy Binaries
 
-    name: Cross compile WireProxy
+    needs: [ "lint", "build", "test" ]
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     env:
       workdir: ./WireProxy
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -33,7 +48,7 @@ jobs:
           go-version: "1.21"
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           workdir: ${{ env.workdir }}
@@ -43,7 +58,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Release binaries
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: wireproxy
           files: ${{ env.workdir }}/dist/*.tar.gz

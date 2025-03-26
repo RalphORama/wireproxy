@@ -1,0 +1,30 @@
+name: Lint
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        go_version:
+          - '1.21'
+
+    steps:
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go_version }}
+
+      - uses: actions/checkout@v4
+
+      - uses: golangci/golangci-lint-action@v7
+        with:
+          version: latest

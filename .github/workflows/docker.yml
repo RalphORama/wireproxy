@@ -1,4 +1,5 @@
 name: Build Docker Image
+
 on:
   push:
     branches:
@@ -20,7 +21,22 @@ permissions:
   id-token: write
 
 jobs:
-  container:
+  lint:
+    uses: "./.github/workflows/_lint.yml"
+
+  build:
+    needs: [ "lint" ]
+    uses: "./.github/workflows/_build.yml"
+
+  test:
+    needs: [ "build" ]
+    uses: "./.github/workflows/_test.yml"
+
+  build_image:
+    name: Build and publish Docker image
+
+    needs: [ "lint", "build", "test" ]
+
     runs-on: ubuntu:latest
 
     env:
@@ -29,13 +45,11 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 2
       matrix:
         platform:
           - linux/amd64
-          - linux/arm
           - linux/arm64
-          - linux/ppc64le
-          - linux/s390x
         base_image:
           - gcr.io/distroless/static-debian11:nonroot
           - gcr.io/distroless/static-debian12:nonroot

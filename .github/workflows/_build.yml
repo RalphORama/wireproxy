@@ -1,0 +1,53 @@
+name: Build
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        go_version:
+          - '1.21'
+        go_os:
+          - windows
+          - linux
+          - darwin
+        go_arch:
+          - amd64
+          - arm64
+
+    env:
+      CGO_ENABLED: 0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go_version }}
+
+      - name: Export dynamic variables
+        id: dynamic_vars
+        run: |
+          echo dir=release_${{ matrix.go_os }}_${{ matrix.go_arch }} >> $GITHUB_OUTPUT
+          echo filename=wireproxy${{ matrix.go_os == 'windows' && '.exe' }} >> $GITHUB_OUTPUT
+
+
+      - name: Build wireproxy for ${{ matrix.go_os }} ${{ matrix.go_arch }}
+        env:
+          GOOS: ${{ matrix.go_os }}
+          GOARCH: $${{ matrix.go_arch }}
+        run: |
+          mkdir -v ${{ steps.dynamic_vars.outputs.dir }}
+          go build -o ${{ steps.dynamic_vars.outputs.dir }}/${{ steps.dynamic_vars.outputs.filename }} -v ./cmd/wireproxy
+
+      - name: Upload ${{ matrix.go_os }} ${{ matrix.go_arch }} artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WireProxy_${{ matrix.go_os }}_${{ matrix.go_arch }}
+          path: ${{ steps.dynamic_vars.outputs.dir }}

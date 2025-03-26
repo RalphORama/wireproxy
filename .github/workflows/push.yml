@@ -1,0 +1,18 @@
+name: Lint, build, and test on push
+
+on:
+  push:
+    # release pipeline runs on push to master with same jobs
+    branches-ignore: ["master"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    uses: "./.github/workflows/_lint.yml"
+
+  build:
+    uses: "./.github/workflows/_build.yml"
+
+  test:
+    uses: "./.github/workflows/_test.yml"
