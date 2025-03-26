@@ -7,7 +7,7 @@ ARG DISTROBASE=gcr.io/distroless/static-debian12:nonroot
 
 
 # Build the project in its own container
-FROM golang:latest as builder
+FROM golang:latest AS builder
 
 # BuildKit Support
 # https://docs.docker.com/reference/dockerfile/#automatic-platform-args-in-the-global-scope
@@ -30,7 +30,7 @@ RUN make
 
 # HACK: Copy statically linked shell from busybox so we can run one test to run one command
 # Could probably split Dockerfiles but... that sounds... awful
-FROM busybox:stable-uclibc as busybox
+FROM busybox:stable-uclibc AS busybox
 
 # Create an Alpine image for distribution
 FROM ${DISTROBASE}
