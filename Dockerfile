@@ -37,7 +37,7 @@ FROM ${DISTROBASE}
 
 COPY --from=busybox /bin/sh /sbin/sh
 
-RUN [ "/sbin/sh", "-c", 'if [ "${DISTROBASE}" = "alpine:latest" ]; then apk add --no-cache curl ca-certificates; fi' ]
+RUN [ "/sbin/sh", "-c", "if [ \"${DISTROBASE}\" = \"alpine:latest\" ]; then apk add --no-cache curl ca-certificates; fi" ]
 
 COPY --from=builder /usr/src/wireproxy/wireproxy /usr/bin/wireproxy
 
